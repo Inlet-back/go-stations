@@ -2,6 +2,10 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+
+	"net/http"
 
 	"github.com/TechBowl-japan/go-stations/model"
 	"github.com/TechBowl-japan/go-stations/service"
@@ -18,9 +22,33 @@ func NewTODOHandler(svc *service.TODOService) *TODOHandler {
 		svc: svc,
 	}
 }
+func (t *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request){
+	
+	if(r.Method == http.MethodPost){
+		var todoRequest model.CreateTODORequest
+		if err := json.NewDecoder(r.Body).Decode(&todoRequest);
+		 err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if(todoRequest.Subject == "" ){
+		 http.Error(w, "subject is required", http.StatusBadRequest)
+		 return
+		}
+		todo,_ := t.Create(r.Context(),&todoRequest)
+		if err :=json.NewEncoder(w).Encode(todo) ;
+		err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+			
+		}
+		fmt.Println(todo)
+	}
+}
 
 // Create handles the endpoint that creates the TODO.
 func (h *TODOHandler) Create(ctx context.Context, req *model.CreateTODORequest) (*model.CreateTODOResponse, error) {
+	// todo := &model.TODO{}
 	_, _ = h.svc.CreateTODO(ctx, "", "")
 	return &model.CreateTODOResponse{}, nil
 }

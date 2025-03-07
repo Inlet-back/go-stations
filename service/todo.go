@@ -27,9 +27,10 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 	)
 	result, err := s.db.ExecContext(ctx, insert, subject,description)
 
-	if err !=nil {
-		return nil,err
-	}
+	if err != nil {
+
+        return nil, err
+    }
 
 	id,err := result.LastInsertId();
 	if err !=nil{
@@ -38,14 +39,9 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 
 
 	row := s.db.QueryRowContext(ctx,confirm,id)
-	
-
-	if err := row.Scan(); err != nil {
-		return nil, err
-	}
 
 	todo := &model.TODO{}
-	if err := row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt); err != nil {
+	if err := row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt,&todo.UpdatedAt); err != nil {
 		return nil, err
 	}
 

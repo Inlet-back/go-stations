@@ -17,6 +17,7 @@ func NewHealthzHandler() *HealthzHandler {
 }
 
 // ServeHTTP implements http.Handler interface.
+//ServeHTTPはHandlerに元からある
 func (h *HealthzHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	response := &model.HealthzResponse{Message: "OK"}
 
