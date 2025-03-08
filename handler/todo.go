@@ -48,9 +48,10 @@ func (t *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request){
 
 // Create handles the endpoint that creates the TODO.
 func (h *TODOHandler) Create(ctx context.Context, req *model.CreateTODORequest) (*model.CreateTODOResponse, error) {
-	// todo := &model.TODO{}
-	_, _ = h.svc.CreateTODO(ctx, "", "")
-	return &model.CreateTODOResponse{}, nil
+	
+	todo, _ := h.svc.CreateTODO(ctx, req.Subject, req.Description)
+	fmt.Println(todo)
+	return &model.CreateTODOResponse{Todo: *todo}, nil
 }
 
 // Read handles the endpoint that reads the TODOs.
