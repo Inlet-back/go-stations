@@ -40,7 +40,7 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 
 	row := s.db.QueryRowContext(ctx,confirm,id)
 
-	todo := &model.TODO{ID: int(id)}
+	todo := &model.TODO{ID: id}
 	
 	if err := row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt,&todo.UpdatedAt); err != nil {
 		return nil, err
@@ -65,8 +65,26 @@ func (s *TODOService) UpdateTODO(ctx context.Context, id int64, subject, descrip
 		update  = `UPDATE todos SET subject = ?, description = ? WHERE id = ?`
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
+	 result,err := s.db.ExecContext(ctx,update,subject,description,id)
+	 if err!=nil{
+		return nil,err
+	}
+	num,err := result.RowsAffected();
+	if err != nil{
+		return nil,err
+	}
+	if(num == 0){
+		err := &model.ErrNotFound{"Update件数が0でした"}
+		return nil,err
+	}
 
-	return nil, nil
+	row := s.db.QueryRowContext(ctx,confirm,id)
+	todo := &model.TODO{ID: id}
+	if err:= row.Scan(&todo.Subject,&todo.Description,&todo.CreatedAt,&todo.UpdatedAt); err !=nil{
+		return nil,err
+	}
+		
+	return todo, nil
 }
 
 // DeleteTODO deletes TODOs on DB by ids.

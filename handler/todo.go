@@ -44,6 +44,7 @@ func (t *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request){
 		}
 		fmt.Println(todo)
 	}
+
 }
 
 // Create handles the endpoint that creates the TODO.
