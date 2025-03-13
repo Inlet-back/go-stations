@@ -51,7 +51,7 @@ func (h *TODOHandler) Create(ctx context.Context, req *model.CreateTODORequest) 
 	
 	todo, _ := h.svc.CreateTODO(ctx, req.Subject, req.Description)
 	fmt.Println(todo)
-	return &model.CreateTODOResponse{Todo: *todo}, nil
+	return &model.CreateTODOResponse{TODO: *todo}, nil
 }
 
 // Read handles the endpoint that reads the TODOs.
