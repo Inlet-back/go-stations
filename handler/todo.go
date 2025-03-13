@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"net/http"
 
@@ -66,8 +67,37 @@ func (t *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request){
 		if err := json.NewEncoder(w).Encode(todo); err != nil{
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
-			
 		}
+		
+	}
+	if r.Method == http.MethodGet{
+		var todoRequest model.ReadTODORequest
+		var err error
+		qyeryParams := r.URL.Query()
+		
+		if qyeryParams.Get("size") !=""{
+			todoRequest.PrevID,_ = strconv.ParseInt(qyeryParams.Get("prev_id"),10,64)
+
+			todoRequest.Size,err  = strconv.ParseInt(qyeryParams.Get("size"),10,64)
+			if err != nil  {
+				http.Error(w,err.Error(),http.StatusBadRequest)
+				return
+			}
+		}else{
+			todoRequest.Size = 5
+		}
+		todos,err := t.Read(r.Context(),&todoRequest)
+		if err!=nil{
+			http.Error(w,err.Error(),http.StatusBadRequest)
+			return
+		}
+		if err :=json.NewEncoder(w).Encode(todos) ;err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+			
+		}	
+
+
 	}
 
 }
@@ -81,8 +111,8 @@ func (h *TODOHandler) Create(ctx context.Context, req *model.CreateTODORequest) 
 
 // Read handles the endpoint that reads the TODOs.
 func (h *TODOHandler) Read(ctx context.Context, req *model.ReadTODORequest) (*model.ReadTODOResponse, error) {
-	_, _ = h.svc.ReadTODO(ctx, 0, 0)
-	return &model.ReadTODOResponse{}, nil
+	todos, err := h.svc.ReadTODO(ctx, req.PrevID, req.Size)
+	return &model.ReadTODOResponse{TODOs: todos}, err
 }
 
 // Update handles the endpoint that updates the TODO.
